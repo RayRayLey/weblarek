@@ -1,7 +1,11 @@
+import './scss/styles.scss';
 import { Basket } from "./components/Models/Basket";
 import { Catalogue } from "./components/Models/Catalogue";
 import { Buyer } from "./components/Models/Buyer";
-import { apiProducts } from "./utils/data";
+import { apiProducts } from './utils/data'; // remove
+import { Compositor } from './components/Communications/Compositor';
+import { API_URL } from './utils/constants';
+import { Api } from './components/base/Api';
 
 // каталог
 const productsModel = new Catalogue();
@@ -51,3 +55,15 @@ console.log('Тут валидатор тоже будет ругаться: ', 
 buyerModel.saveBuyer(buyerModel.payment = 'cash', buyerModel.address = 'I live here', buyerModel.email = "noyb@gmail.com", buyerModel.phone = "+7***");
 console.log('Заполнили полностью: ', buyerModel.getBuyer());
 console.log('Ошибок не будет: ', buyerModel.validator());
+
+// запрос на сервер
+
+const api = new Api(API_URL);
+const compositor = new Compositor(api);
+
+const products = await compositor.getProducts();
+
+const testModel = new Catalogue();
+testModel.saveItems(products.items); 
+
+console.log('Массив товаров из нового каталога: ', testModel.getItems());

@@ -21,3 +21,13 @@ export interface IBuyer {
   phone: string;
   address: string;
 } 
+
+export interface ProductsList {
+  total: number;
+  items: IProduct[];
+}
+
+export interface OrderList {
+  buyer: IBuyer;
+  items: IProduct[];
+}

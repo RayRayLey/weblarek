@@ -4,10 +4,7 @@ export class Catalogue {
     public items: IProduct[] = [];
     public itemDetails: IProduct | undefined;
     
-    constructor(items: IProduct[] = [], details?: IProduct) {
-        this.items = items;
-        this.itemDetails = details;
-    }
+    constructor() {}
 
     public saveItems(items: IProduct[]): void {
         this.items = items;
