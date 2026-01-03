@@ -1,7 +1,7 @@
 import { IApi, OrderList, ProductsList } from "../../types";
 import { ApiPostMethods } from "../../types";
 
-export class Compositor{
+export class ApiService{
     public API: IApi;
 
     constructor(API: IApi) {

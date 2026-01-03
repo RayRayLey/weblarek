@@ -2,32 +2,38 @@ import './scss/styles.scss';
 import { Basket } from "./components/Models/Basket";
 import { Catalogue } from "./components/Models/Catalogue";
 import { Buyer } from "./components/Models/Buyer";
-import { apiProducts } from './utils/data'; // remove
-import { Compositor } from './components/Communications/Compositor';
+import { ApiService } from './components/Communications/ApiService';
 import { API_URL } from './utils/constants';
 import { Api } from './components/base/Api';
 
+// запрос на сервер
+
+const api = new Api(API_URL);
+const service = new ApiService(api);
+
+const products = await service.getProducts();
+
 // каталог
-const productsModel = new Catalogue();
-productsModel.saveItems(apiProducts.items); 
+const testModel = new Catalogue();
+testModel.saveItems(products.items); 
 
-console.log('Массив товаров из каталога: ', productsModel.getItems());
+console.log('Массив товаров из каталога: ', testModel.getItems());
 
-console.log('Элемент по ID: ', productsModel.findItem("412bcf81-7e75-4e70-bdb9-d3c73c9803b7"));
+console.log('Элемент по ID: ', testModel.findItem("412bcf81-7e75-4e70-bdb9-d3c73c9803b7"));
 
-productsModel.saveDetails(apiProducts.items[2]);
-console.log('Товар для подробного отображения: ', productsModel.getDetails());
+testModel.saveDetails(testModel.items[2]);
+console.log('Товар для подробного отображения: ', testModel.getDetails());
 
 // корзина
 const basketModel = new Basket();
-basketModel.addItem(apiProducts.items[1]);
-basketModel.addItem(apiProducts.items[3]);
+basketModel.addItem(products.items[1]);
+basketModel.addItem(products.items[3]);
 console.log('Массив товаров в корзине: ', basketModel.getBasketItems());
 
-basketModel.addItem(apiProducts.items[2]);
+basketModel.addItem(products.items[2]);
 console.log('Добавили элемент в массив: ', basketModel.getBasketItems());
 
-basketModel.removeItem(apiProducts.items[3]);
+basketModel.removeItem(products.items[3]);
 console.log('Убрали элемент из массива: ', basketModel.getBasketItems());
 
 console.log('Количество товаров в корзине: ', basketModel.getItemAmount());
@@ -55,15 +61,3 @@ console.log('Тут валидатор тоже будет ругаться: ', 
 buyerModel.saveBuyer(buyerModel.payment = 'cash', buyerModel.address = 'I live here', buyerModel.email = "noyb@gmail.com", buyerModel.phone = "+7***");
 console.log('Заполнили полностью: ', buyerModel.getBuyer());
 console.log('Ошибок не будет: ', buyerModel.validator());
-
-// запрос на сервер
-
-const api = new Api(API_URL);
-const compositor = new Compositor(api);
-
-const products = await compositor.getProducts();
-
-const testModel = new Catalogue();
-testModel.saveItems(products.items); 
-
-console.log('Массив товаров из нового каталога: ', testModel.getItems());
