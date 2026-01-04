@@ -6,7 +6,7 @@ export class Basket {
     constructor() {}
 
     public getBasketItems(): IProduct[] {
-        return this.items;
+        return [...this.items];
     }
 
     public addItem(item: IProduct): void {
@@ -14,7 +14,7 @@ export class Basket {
     }
 
     public removeItem(item: IProduct): void {
-        let index = this.items.findIndex(el => el === item);
+        let index = this.items.findIndex(el => el.id === item.id);
         this.items.splice(index, 1);
     }
 

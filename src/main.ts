@@ -7,15 +7,19 @@ import { API_URL } from './utils/constants';
 import { Api } from './components/base/Api';
 
 // запрос на сервер
-
 const api = new Api(API_URL);
 const service = new ApiService(api);
 
-const products = await service.getProducts();
-
 // каталог
 const testModel = new Catalogue();
-testModel.saveItems(products.items); 
+
+try {
+    const products = await service.getProducts();
+
+    testModel.saveItems(products.items); 
+} catch (error) {
+    console.error(error);
+}
 
 console.log('Массив товаров из каталога: ', testModel.getItems());
 
@@ -26,14 +30,14 @@ console.log('Товар для подробного отображения: ', t
 
 // корзина
 const basketModel = new Basket();
-basketModel.addItem(products.items[1]);
-basketModel.addItem(products.items[3]);
+basketModel.addItem(testModel.items[1]);
+basketModel.addItem(testModel.items[8]);
 console.log('Массив товаров в корзине: ', basketModel.getBasketItems());
 
-basketModel.addItem(products.items[2]);
+basketModel.addItem(testModel.items[3]);
 console.log('Добавили элемент в массив: ', basketModel.getBasketItems());
 
-basketModel.removeItem(products.items[3]);
+basketModel.removeItem(testModel.items[1]);
 console.log('Убрали элемент из массива: ', basketModel.getBasketItems());
 
 console.log('Количество товаров в корзине: ', basketModel.getItemAmount());
