@@ -1,3 +1,6 @@
+import { CardCatalog } from "../components/View/CardCatalog";
+import { cloneTemplate } from "../utils/utils";
+
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 export type TPayment = 'cash' | 'card' | '';
 
@@ -31,3 +34,21 @@ export interface OrderList {
   buyer: IBuyer;
   items: IProduct[];
 }
+
+/** 
+events.on('catalog:changed', () => {
+  const itemCards = productsModel.getItems().map((item) => {
+    const card = new CardCatalog(cloneTemplate(CardCatalogTemplate), {
+      onClick: () => events.emit('card:select', item),
+    });
+    return card.render(item);
+  });
+
+  gallery.render({ catalog: itemCards });
+});
+
+larekApi.getProductList().then((data) => {
+  productsModel.setItems(data.items);
+}).catch((err) => console.error(err));
+
+**/

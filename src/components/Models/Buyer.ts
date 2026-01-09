@@ -1,12 +1,17 @@
 import { TPayment } from "../../types";
+import { EventEmitter } from "../base/Events";
 
 export class Buyer {
     public payment: TPayment | '' = '';
     public address: string = '';
     public phone: string = '';
     public email: string = '';
-        
-    constructor() {}
+    
+    private events: EventEmitter;
+
+    constructor(events: EventEmitter) {
+        this.events = events;
+    }
     
     public saveBuyer(
         payment: TPayment | '' = '',
@@ -18,6 +23,7 @@ export class Buyer {
         if(address !== '') this.address = address;
         if(phone !== '') this.phone = phone;
         if(email !== '') this.email = email;
+        this.events.emit('buyer:saved');
     }
     
     public getBuyer(): {payment: TPayment | '', address?: string, phone?: string, email?: string} {

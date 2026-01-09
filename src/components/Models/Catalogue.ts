@@ -1,13 +1,19 @@
 import { IProduct } from "../../types";
+import { EventEmitter } from "../base/Events";
 
 export class Catalogue {
     public items: IProduct[] = [];
     public itemDetails: IProduct | undefined;
     
-    constructor() {}
+    private events: EventEmitter;
+
+    constructor(events: EventEmitter) {
+        this.events = events;
+    }
 
     public saveItems(items: IProduct[]): void {
         this.items = items;
+        this.events.emit('items:saved');
     }
 
     public getItems(): IProduct[] {
