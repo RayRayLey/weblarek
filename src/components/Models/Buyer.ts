@@ -1,8 +1,8 @@
-import { TPayment } from "../../types";
+import { IBuyer, TPayment } from "../../types";
 import { EventEmitter } from "../base/Events";
 
 export class Buyer {
-    public payment: TPayment | '' = '';
+    public payment: TPayment = '';
     public address: string = '';
     public phone: string = '';
     public email: string = '';
@@ -14,10 +14,10 @@ export class Buyer {
     }
     
     public saveBuyer(
-        payment: TPayment | '' = '',
-        address: string  = '',
+        payment: TPayment = '',
+        email: string  = '',
         phone: string  = '',
-        email: string  = ''
+        address: string  = ''
     ): void {
         if(payment !== '') this.payment = payment;
         if(address !== '') this.address = address;
@@ -26,12 +26,12 @@ export class Buyer {
         this.events.emit('buyer:saved');
     }
     
-    public getBuyer(): {payment: TPayment | '', address?: string, phone?: string, email?: string} {
+    public getBuyer(): IBuyer {
         return {
             payment: this.payment,
-            address: this.address,
+            email: this.email,
             phone: this.phone,
-            email: this.email
+            address: this.address
         };
     }
 
@@ -44,19 +44,19 @@ export class Buyer {
 
     public validator(): {payment?: string, address?: string, phone?: string, email?: string} {
         let errors: {payment?: string, address?: string, phone?: string, email?: string} = {};
-        if(this.payment === '') {
+        if(!this.payment) {
             errors.payment = 'Не выбран вид оплаты';
         }
 
-        if(this.address === '') {
+        if(!this.address) {
             errors.address = 'Укажите адрес доставки';
         }
 
-        if(this.phone === '') {
+        if(!this.phone) {
             errors.phone = 'Укажите номер для связи';
         }
 
-        if(this.email === '') {
+        if(!this.email) {
             errors.email = 'Укажите емэйл';
         }
 

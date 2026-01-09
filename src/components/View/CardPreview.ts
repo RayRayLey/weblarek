@@ -24,7 +24,8 @@ export class CardPreview extends Card<TCardPreview>{
         
 
         this.addToCartButton.addEventListener('click', () => {
-            this.events.emit('card:add');
+            this.events.emit('card:add'); // попытка добавить товар в корзину или удалить, если он уже есть
+            this.events.emit('modal:close');
         });
     }
 

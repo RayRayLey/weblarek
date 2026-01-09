@@ -3,27 +3,36 @@ import { Form } from "./Form";
 import { IEvents } from "../base/Events";
 
 export class FormContacts extends Form{
-    protected emailElement: HTMLElement;
-    protected phoneElement: HTMLElement;
-    protected payButton: HTMLButtonElement;
+    emailElement: HTMLInputElement;
+    phoneElement: HTMLInputElement;
+    payButton: HTMLButtonElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);
 
-        this.emailElement = ensureElement<HTMLElement>('.basket__item-index', this.container);
-        this.phoneElement = ensureElement<HTMLElement>('.basket__item-delete', this.container);
-        this.payButton = ensureElement<HTMLButtonElement>('.button', this.container);
+        this.emailElement = ensureElement<HTMLInputElement>('.form[name="contacts"] .form__input[name="email"]', this.container);
+        this.phoneElement = ensureElement<HTMLInputElement>('.form[name="contacts"] .form__input[name="phone"]', this.container);
+        this.payButton = ensureElement<HTMLButtonElement>('.form[name="contacts"] .modal__actions .button', this.container);
+        
+        this.emailElement.addEventListener('input', () => {
+            this.events.emit('email:change')
+        });
 
-        this.payButton.addEventListener('click', () => {
-            this.events.emit('success:open');
+        this.phoneElement.addEventListener('input', () => {
+            this.events.emit('phone:change')
+        });
+
+        this.payButton.addEventListener('click', (event) => {
+            event.preventDefault()
+            this.events.emit('success:open', event);
         });
     }
 
     set email(value: string) {
-        this.emailElement.textContent = value;
+        this.emailElement.value = value;
     }
 
     set phone(value: string) {
-        this.phoneElement.textContent = value;
+        this.phoneElement.value = value;
     }
 }

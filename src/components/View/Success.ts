@@ -3,7 +3,7 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
 interface ISuccess {
-    price: number;
+    price: string;
 }
 
 export class Success extends Component<ISuccess>{
@@ -21,8 +21,7 @@ export class Success extends Component<ISuccess>{
         });
     }
 
-    set price(value: number) {
-        const defaultprice = this.priceElement.textContent;
-        this.priceElement.textContent = defaultprice.replace(/\d+/g, String(value));
+    set price(value: string) {
+        this.priceElement.textContent = value;
     }
 }

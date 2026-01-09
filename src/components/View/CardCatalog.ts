@@ -4,7 +4,7 @@ import { ensureElement } from "../../utils/utils";
 import { Card } from "./Card";
 import { CDN_URL } from "../../utils/constants";
 
-interface ICardActions {
+export interface ICardActions {
     onClick?: () => void;
 }
 

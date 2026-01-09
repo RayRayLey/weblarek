@@ -22,6 +22,6 @@ export class Card<ICard> extends Component<ICard>{
     }
 
     set price(value: string) {
-        this.priceElement.textContent = value;
+        this.priceElement.textContent = String(value);
     }
 }
