@@ -20,7 +20,7 @@ export interface IBuyer {
   email: string;
   phone: string;
   address: string;
-} 
+}
 
 export interface ProductsList {
   total: number;
@@ -33,5 +33,10 @@ export interface OrderList {
   phone: string;
   address: string;
   items: string[];
+  total: number;
+}
+
+export type serverResponce = {
+  id: string;
   total: number;
 }

@@ -17,18 +17,22 @@ import { Success } from './components/View/Success';
 import { Gallery } from './components/View/Gallery';
 import { Modal } from './components/View/Modal';
 import { Header } from './components/View/Header';
-import { IProduct, OrderList } from './types';
+import { IProduct, OrderList, serverResponce } from './types';
 
 
-function confirmPrice (price: number | null | undefined): string {
-    if (price === null || price === 0 || price === undefined) {
+function confirmPrice (price: number | null): string {
+    if (price === null) {
         return 'Бесценно';
-    } else{
+    } else {
         return String(price) + ' синапсов';
     }   
 }
 
-const cardState: string[] = ['Недоступно', 'Купить', 'Удалить из корзины'];
+const cardState = {
+    buy: 'Купить',
+    delete: 'Удалить из корзины',
+    disabled: 'Недоступно'
+};
 
 // запрос на сервер
 const api = new Api(API_URL);
@@ -53,7 +57,7 @@ if (!headerContainer) {
 const header = new Header(events, headerContainer);
 
 //карточки товаров в каталоге
-let cards: HTMLElement[] = [];
+
 const display = new Gallery(gallery);
 
 // пустое модальное окно
@@ -61,10 +65,11 @@ const modalContainer = document.getElementById('modal-container');
 if (!modalContainer) {
     throw new Error('Элемент #modal-container не найден в разметке');
 }
-let window = new Modal(events, modalContainer);
+const modalElement = new Modal(events, modalContainer);
 
 // добавление данных о товарах в каталог
 events.on('items:saved', () => {
+    const cards: HTMLElement[] = [];
     const items = testModel.getItems();
     items.forEach((item) => {
         const cardContainer = cloneTemplate<HTMLElement>('#card-catalog');
@@ -106,21 +111,21 @@ events.on('card:active', (data: { id: string }) => {
         info.text = currentItem.description;
 
         if (currentItem.price === null) {
-            info.addToCartButton.disabled = true;
-            info.addToCartButton.textContent = cardState[0];
+            info.buttonStatus = true;
+            info.buttonText = cardState.disabled;
         } else if (inBasket) {
-            info.addToCartButton.textContent = cardState[2];
+            info.buttonText = cardState.delete;
         } else {
-            info.addToCartButton.textContent = cardState[1];
+            info.buttonText = cardState.buy;
         }
 
-        window.content = previewContainer;
-        modalContainer.classList.add('modal_active');
+        modalElement.content = previewContainer;
+        modalElement.open = 'modal_active';
     }
 })
 
 events.on('modal:close', () => {
-    modalContainer.classList.remove('modal_active');
+    modalElement.close = 'modal_active';
     currentItem = undefined;
     info = undefined;
 })
@@ -132,10 +137,10 @@ events.on('card:add', () => {
     if(info && currentItem && !inBasket) {
         basketModel.addItem(currentItem);
         header.counter = basketModel.getItemAmount();
-        info.addToCartButton.textContent = cardState[2];
+        info.buttonText = cardState.delete;
     } else if (info && currentItem) {
         basketModel.removeItem(currentItem);
-        info.addToCartButton.textContent = cardState[1];
+        info.buttonText = cardState.buy;
     }
 })
 
@@ -149,8 +154,8 @@ events.on('basket:open', () => {
 
     events.emit('basket:change');
 
-    window.content = basketContainer;
-    modalContainer.classList.add('modal_active');
+    modalElement.content = basketContainer;
+    modalElement.open = 'modal_active';
 })
 
 events.on('basket:change', () => {
@@ -162,7 +167,7 @@ events.on('basket:change', () => {
     const basketItems = basketModel.getBasketItems();
 
     if (basketItems.length === 0) {
-        basketContent.orderButton.disabled = true;
+        basketContent.buttonStatus = true;
     }
 
     basketItems.forEach((item, index) => {
@@ -170,7 +175,7 @@ events.on('basket:change', () => {
         const cardBasket = new CardBasket(events, cardContainer);
 
         cardBasket.index = index + 1;
-        cardBasket.price = String(item.price) + ' синапсов';
+        cardBasket.price = confirmPrice(item.price);
         cardBasket.title = item.title;
         cardBasket.id = item.id;
 
@@ -182,8 +187,9 @@ events.on('basket:change', () => {
 })
 
 events.on('basket:item:removed', (data: { id: string }) => {
-    let id = data.id;
-    let item = testModel.findItem(id);
+    const id = data.id;
+    const item = testModel.findItem(id);
+
     if(item){
         basketModel.removeItem(item);
     }
@@ -200,14 +206,15 @@ events.on('order:start', () => {
 
     buyerModel = new Buyer(events);
 
-    window.content = orderContainer;
-    modalContainer.classList.add('modal_active');
+    modalElement.content = orderContainer;
+    modalElement.open = 'modal_active';
 })
 
 events.on('address:change', () => {
     if(!order || !buyerModel) return;
 
-    buyerModel.address = order.addressElement.value;
+    const addressInput =  order.addressElement.value;
+    buyerModel.address = addressInput;
 
     events.emit('order:change');
 })
@@ -216,8 +223,7 @@ events.on('payment:card', () => {
     if(!order || !buyerModel) return;
 
     buyerModel.payment = 'online';
-    order?.cardButton.classList.add('button_alt-active');
-    order?.cashButton.classList.remove('button_alt-active');
+    order.cardActive = 'button_alt-active';
 
     events.emit('order:change');
 })
@@ -226,30 +232,29 @@ events.on('payment:cash', () => {
     if(!order || !buyerModel) return;
 
     buyerModel.payment = 'ofline';
-    order?.cashButton.classList.add('button_alt-active');
-    order?.cardButton.classList.remove('button_alt-active');
+    order.cashActive = 'button_alt-active';
 
     events.emit('order:change');
 })
 
 events.on('order:change', () => {
     if(!order || !buyerModel) return;
-    let errors = buyerModel.validator();
-    let errorMessages: string[] = [];
+    const errors = buyerModel.validator();
+    const errorMessages: string[] = [];
 
     if (errors.address) {
         errorMessages.push(errors.address);
-        order.nextButton.disabled = true;
+        order.nextButtonStatus = true;
     }
     if (errors.payment) {
         errorMessages.push(errors.payment);
-        order.nextButton.disabled = true;
+        order.nextButtonStatus = true;
     }
 
     order.formErrors = errorMessages.join('; ');
 
     if (!errors.payment && !errors.address) {
-        order.nextButton.disabled = false;
+        order.nextButtonStatus = false;
     }
 })
 
@@ -259,52 +264,51 @@ events.on('contacts:open', () => {
     const contactsContainer = cloneTemplate<HTMLElement>('#contacts');
     contactsForm = new FormContacts(events, contactsContainer);
 
-    window.content = contactsContainer;
-    modalContainer.classList.add('modal_active');
+    modalElement.content = contactsContainer;
+    modalElement.open = 'modal_active';
 })
 
 
 events.on('email:change', () => {
     if(!contactsForm || !buyerModel) return;
 
-    buyerModel.email = contactsForm.emailElement.value;
+    const emailInput = contactsForm.emailElement.value
+    buyerModel.email = emailInput;
     events.emit('contacts:change');
 })
 
 events.on('phone:change', () => {
     if(!contactsForm || !buyerModel) return;
 
-    buyerModel.phone = contactsForm.phoneElement.value;
+    const phoneInput = contactsForm.phoneElement.value;
+    buyerModel.phone = phoneInput;
     events.emit('contacts:change');
 })
 
 events.on('contacts:change', () => {
     if(!contactsForm || !buyerModel) return;
-    let errors = buyerModel.validator();
-    let errorMessages: string[] = [];
+    const errors = buyerModel.validator();
+    const errorMessages: string[] = [];
 
     if (errors.email) {
         errorMessages.push(errors.email);
-        contactsForm.payButton.disabled = true;
+        contactsForm.payButtonStatus= true;
     }
     if (errors.phone) {
         errorMessages.push(errors.phone);
-        contactsForm.payButton.disabled = true;
+        contactsForm.payButtonStatus = true;
     }
 
     contactsForm.formErrors = errorMessages.join('; ')
 
     if(!errors.email && !errors.phone) {
-        contactsForm.payButton.disabled = false;
+        contactsForm.payButtonStatus = false;
     }
 })
 
 let successScreen: Success | undefined = undefined;
 
-events.on('success:open', () => {
-    const successContainer = cloneTemplate<HTMLElement>('#success');
-    successScreen = new Success(events, successContainer);
-
+events.on('form:send', () => {
     if(!buyerModel || !basketModel) return;
 
     const orderData: OrderList = {
@@ -316,17 +320,24 @@ events.on('success:open', () => {
         total: basketModel.getWholePrice()
     };
 
-    service.sendData(orderData);
-    
-    successScreen.price = "Списано " + confirmPrice(basketModel.getWholePrice());
+    service.sendData(orderData).then((responce) => {
+        events.emit('success:open', responce)
+    }).catch((err) => {console.error(err)})
+})
 
-    window.content = successContainer;
-    modalContainer.classList.add('modal_active');
+events.on('success:open', (responce: serverResponce) => {
+    const successContainer = cloneTemplate<HTMLElement>('#success');
+    successScreen = new Success(events, successContainer);
+    
+    successScreen.price = "Списано " + confirmPrice(responce.total);
+
+    modalElement.content = successContainer;
+    modalElement.open = 'modal_active';
 })
 
 events.on('success:close', () => {
     if(!buyerModel) return;
-    modalContainer.classList.remove('modal_active');
+    modalElement.close = 'modal_active';
     successScreen = undefined;
     basketModel.clearBasket();
     buyerModel.clearBuyer();

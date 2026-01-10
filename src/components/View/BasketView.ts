@@ -8,9 +8,9 @@ interface IBasket {
 }
 
 export class BasketView extends Component<IBasket>{
-    protected priceElement: HTMLElement;
-    orderButton: HTMLButtonElement;
-    protected basketListElement: HTMLElement;
+    private priceElement: HTMLElement;
+    private orderButton: HTMLButtonElement;
+    private basketListElement: HTMLElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);
@@ -34,5 +34,13 @@ export class BasketView extends Component<IBasket>{
         items.forEach(item => {
             this.basketListElement.appendChild(item);
         })
+    }
+
+    set buttonStatus(value: boolean) {
+        this.orderButton.disabled = value;
+    }
+
+    set buttonText(value: string) {
+        this.orderButton.textContent = value;
     }
 }

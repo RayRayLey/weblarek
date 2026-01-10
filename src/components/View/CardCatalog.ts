@@ -12,8 +12,8 @@ type CategoryKey = keyof typeof categoryMap;
 export type TCardCatalog = Pick<IProduct, 'image' | 'category'>;
 
 export class CardCatalog extends Card<TCardCatalog>{
-    protected categoryElement: HTMLElement;
-    protected imageElement: HTMLImageElement;
+    private categoryElement: HTMLElement;
+    private imageElement: HTMLImageElement;
 
     constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);

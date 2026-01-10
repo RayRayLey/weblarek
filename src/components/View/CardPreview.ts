@@ -9,10 +9,10 @@ type CategoryKey = keyof typeof categoryMap;
 export type TCardPreview = Pick<IProduct, 'image' | 'category' | 'description'>;
 
 export class CardPreview extends Card<TCardPreview>{
-    protected categoryElement: HTMLElement;
-    protected imageElement: HTMLImageElement;
-    protected textElement: HTMLElement;
-    addToCartButton: HTMLButtonElement;
+    private categoryElement: HTMLElement;
+    private imageElement: HTMLImageElement;
+    private textElement: HTMLElement;
+    private addToCartButton: HTMLButtonElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);
@@ -47,5 +47,13 @@ export class CardPreview extends Card<TCardPreview>{
 
     set text(value: string) {
         this.textElement.textContent = value;
+    }
+
+    set buttonStatus(value: boolean) {
+        this.addToCartButton.disabled = value;
+    }
+
+    set buttonText(value: string) {
+        this.addToCartButton.textContent = value;
     }
 }

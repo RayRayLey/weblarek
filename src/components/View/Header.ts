@@ -7,8 +7,8 @@ interface IHeader {
 }
 
 export class Header extends Component<IHeader>{
-    protected counterElement: HTMLElement;
-    protected basketButton: HTMLButtonElement;
+    private counterElement: HTMLElement;
+    private basketButton: HTMLButtonElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);

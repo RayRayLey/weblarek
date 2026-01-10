@@ -5,9 +5,9 @@ import { TPayment } from "../../types";
 
 export class FormOrder extends Form{
     addressElement: HTMLInputElement;
-    cardButton: HTMLButtonElement;
-    cashButton: HTMLButtonElement;
-    nextButton: HTMLButtonElement;
+    private cardButton: HTMLButtonElement;
+    private cashButton: HTMLButtonElement;
+    private nextButton: HTMLButtonElement;
     protected payment: TPayment = '';
 
     constructor(protected events: IEvents, container: HTMLElement) {
@@ -37,11 +37,25 @@ export class FormOrder extends Form{
         });
     }
 
-    set adress(value: string) {
+    set address(value: string) {
         this.addressElement.value = value;
     }
 
     set paymentMethod(value: TPayment) {
         this.payment = value;
+    }
+
+    set cashActive(value: string) {
+        this.cashButton.classList.add(value);
+        this.cardButton.classList.remove(value);
+    }
+
+    set cardActive(value: string) {
+        this.cardButton.classList.add(value);
+        this.cashButton.classList.remove(value);
+    }
+
+    set nextButtonStatus(value: boolean) {
+        this.nextButton.disabled = value;
     }
 }

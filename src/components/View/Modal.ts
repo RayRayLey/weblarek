@@ -7,9 +7,9 @@ interface IModal {
 }
 
 export class Modal extends Component<IModal>{
-    protected modalElement: HTMLElement;
-    protected contentElement: HTMLElement;
-    protected closeButton: HTMLButtonElement;
+    private modalElement: HTMLElement;
+    private contentElement: HTMLElement;
+    private closeButton: HTMLButtonElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);
@@ -29,6 +29,14 @@ export class Modal extends Component<IModal>{
         this.contentElement.addEventListener('click', (event) => {
             event.stopPropagation();
         })
+    }
+
+    set open(value: string) {
+        this.modalElement.classList.add(value);
+    }
+
+    set close(value: string) {
+        this.modalElement.classList.remove(value);
     }
 
     set content(element: HTMLElement) {

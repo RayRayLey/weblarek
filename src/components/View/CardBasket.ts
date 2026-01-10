@@ -8,9 +8,9 @@ type TCardBasket = {
 }
 
 export class CardBasket extends Card<TCardBasket>{
-    protected indexElement: HTMLElement;
-    deleteButton: HTMLButtonElement;
-    protected cardId: string = '';
+    private indexElement: HTMLElement;
+    private deleteButton: HTMLButtonElement;
+    private cardId: string = '';
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);

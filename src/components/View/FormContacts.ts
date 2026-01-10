@@ -5,7 +5,7 @@ import { IEvents } from "../base/Events";
 export class FormContacts extends Form{
     emailElement: HTMLInputElement;
     phoneElement: HTMLInputElement;
-    payButton: HTMLButtonElement;
+    private payButton: HTMLButtonElement;
 
     constructor(protected events: IEvents, container: HTMLElement) {
         super(container);
@@ -24,7 +24,7 @@ export class FormContacts extends Form{
 
         this.payButton.addEventListener('click', (event) => {
             event.preventDefault()
-            this.events.emit('success:open', event);
+            this.events.emit('form:send', event);
         });
     }
 
@@ -34,5 +34,9 @@ export class FormContacts extends Form{
 
     set phone(value: string) {
         this.phoneElement.value = value;
+    }
+
+    set payButtonStatus(value: boolean) {
+        this.payButton.disabled = value;
     }
 }
