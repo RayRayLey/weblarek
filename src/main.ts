@@ -120,12 +120,12 @@ events.on('card:active', (data: { id: string }) => {
         }
 
         modalElement.content = previewContainer;
-        modalElement.open = 'modal_active';
+        modalElement.open();
     }
 })
 
 events.on('modal:close', () => {
-    modalElement.close = 'modal_active';
+    modalElement.close();
     currentItem = undefined;
     info = undefined;
 })
@@ -155,7 +155,7 @@ events.on('basket:open', () => {
     events.emit('basket:change');
 
     modalElement.content = basketContainer;
-    modalElement.open = 'modal_active';
+    modalElement.open();
 })
 
 events.on('basket:change', () => {
@@ -207,7 +207,7 @@ events.on('order:start', () => {
     buyerModel = new Buyer(events);
 
     modalElement.content = orderContainer;
-    modalElement.open = 'modal_active';
+    modalElement.open();
 })
 
 events.on('address:change', () => {
@@ -223,7 +223,7 @@ events.on('payment:card', () => {
     if(!order || !buyerModel) return;
 
     buyerModel.payment = 'online';
-    order.cardActive = 'button_alt-active';
+    order.cardActive();
 
     events.emit('order:change');
 })
@@ -232,7 +232,7 @@ events.on('payment:cash', () => {
     if(!order || !buyerModel) return;
 
     buyerModel.payment = 'ofline';
-    order.cashActive = 'button_alt-active';
+    order.cashActive();
 
     events.emit('order:change');
 })
@@ -265,7 +265,7 @@ events.on('contacts:open', () => {
     contactsForm = new FormContacts(events, contactsContainer);
 
     modalElement.content = contactsContainer;
-    modalElement.open = 'modal_active';
+    modalElement.open();
 })
 
 
@@ -308,6 +308,36 @@ events.on('contacts:change', () => {
 
 let successScreen: Success | undefined = undefined;
 
+function closeSuccess() {
+    if(!buyerModel) return;
+    modalElement.close();
+    successScreen = undefined;
+    basketModel.clearBasket();
+    buyerModel.clearBuyer();
+}
+
+function openSuccess(responce: serverResponce) {
+    const successContainer = cloneTemplate<HTMLElement>('#success');
+    successScreen = new Success(events, successContainer);
+    
+    successScreen.price = "Списано " + confirmPrice(responce.total);
+
+    modalElement.content = successContainer;
+    modalElement.open();
+
+    const modalHandler = () => {
+        closeSuccess();
+        events.off('modal:close', modalHandler)
+    };
+    events.on('modal:close', modalHandler);
+
+    const buttonHandler = () => {
+        closeSuccess();
+        events.off('success:close', buttonHandler);
+    };
+    events.on('success:close', buttonHandler);
+}
+
 events.on('form:send', () => {
     if(!buyerModel || !basketModel) return;
 
@@ -321,26 +351,12 @@ events.on('form:send', () => {
     };
 
     service.sendData(orderData).then((responce) => {
-        events.emit('success:open', responce)
+        openSuccess(responce);
     }).catch((err) => {console.error(err)})
 })
 
-events.on('success:open', (responce: serverResponce) => {
-    const successContainer = cloneTemplate<HTMLElement>('#success');
-    successScreen = new Success(events, successContainer);
-    
-    successScreen.price = "Списано " + confirmPrice(responce.total);
-
-    modalElement.content = successContainer;
-    modalElement.open = 'modal_active';
-})
-
 events.on('success:close', () => {
-    if(!buyerModel) return;
-    modalElement.close = 'modal_active';
-    successScreen = undefined;
-    basketModel.clearBasket();
-    buyerModel.clearBuyer();
+    closeSuccess();
 })
 
 try {

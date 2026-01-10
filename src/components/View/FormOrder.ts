@@ -45,14 +45,14 @@ export class FormOrder extends Form{
         this.payment = value;
     }
 
-    set cashActive(value: string) {
-        this.cashButton.classList.add(value);
-        this.cardButton.classList.remove(value);
+    cashActive() {
+        this.cashButton.classList.add('button_alt-active');
+        this.cardButton.classList.remove('button_alt-active');
     }
 
-    set cardActive(value: string) {
-        this.cardButton.classList.add(value);
-        this.cashButton.classList.remove(value);
+    cardActive() {
+        this.cardButton.classList.add('button_alt-active');
+        this.cashButton.classList.remove('button_alt-active');
     }
 
     set nextButtonStatus(value: boolean) {
