@@ -75,7 +75,7 @@ events.on('items:saved', () => {
         const cardContainer = cloneTemplate<HTMLElement>('#card-catalog');
         const cardCatalog = new CardCatalog(cardContainer, {
             onClick() {
-                events.emit('card:active', { id: item.id })
+                cardActive(item.id);
             },
         });
         cardCatalog.category = item.category;
@@ -88,14 +88,13 @@ events.on('items:saved', () => {
     display.render({ catalog: cards });
 })
 
-
 // подробная информация о карточке в модалке
 let info: CardPreview | undefined = undefined;
 let currentItem: IProduct | undefined = undefined;
 let itemId: string = '';
 
-events.on('card:active', (data: { id: string }) => {
-    itemId = data.id;
+function cardActive(id: string) {
+    itemId = id;
     currentItem = testModel.findItem(itemId);
 
     const previewContainer = cloneTemplate<HTMLElement>('#card-preview');
@@ -122,7 +121,7 @@ events.on('card:active', (data: { id: string }) => {
         modalElement.content = previewContainer;
         modalElement.open();
     }
-})
+}
 
 events.on('modal:close', () => {
     modalElement.close();
