@@ -1,12 +1,7 @@
 import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 
-interface ICard {
-    title: string;
-    price: string;
-}
-
-export class Card<ICard> extends Component<ICard>{
+export class Card<T> extends Component<T>{
     protected priceElement: HTMLElement;
     protected titleElement: HTMLElement;
 
